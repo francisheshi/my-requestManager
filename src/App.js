@@ -1,87 +1,88 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import AddRequest from "./components/AddRequest";
-import Requests from "./components/Requests";
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import Header from './components/Header'
+import Footer from './components/Footer'
+import Tasks from './components/Tasks'
+import AddTask from './components/AddTask'
+import About from './components/About'
 
 const App = () => {
-  const [showAddRequest, setShowAddRequest] = useState(false)
-  const [requests, setRequests] = useState([])
+  const [showAddTask, setShowAddTask] = useState(false)
+  const [tasks, setTasks] = useState([])
 
   useEffect(() => {
-    const getRequests = async () => {
-      const requestsFromServer = await fetchRequests()
-      setRequests(requestsFromServer)
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks()
+      setTasks(tasksFromServer)
     }
 
-    getRequests()
+    getTasks()
   }, [])
 
-  // Fetch Requests
-  const fetchRequests = async () => {
-    const res = await fetch('http://localhost:3000/requests')
+  // Fetch Tasks
+  const fetchTasks = async () => {
+    const res = await fetch('http://localhost:5000/tasks')
     const data = await res.json()
 
     return data
   }
 
-  // Fetch Request
-  const fetchRequest = async (id) => {
-    const res = await fetch(`http://localhost:3000/requests/${id}`)
+  // Fetch Task
+  const fetchTask = async (id) => {
+    const res = await fetch(`http://localhost:5000/tasks/${id}`)
     const data = await res.json()
 
     return data
   }
 
-  // Add Request
-  const addRequest = async (request) => {
-    const res = await fetch('http://localhost:3000/requests', {
+  // Add Task
+  const addTask = async (task) => {
+    const res = await fetch('http://localhost:5000/tasks', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify(task),
     })
 
     const data = await res.json()
 
-    setRequests([...requests, data])
+    setTasks([...tasks, data])
 
     // const id = Math.floor(Math.random() * 10000) + 1
-    // const newRequest = { id, ...request }
-    // setRequests([...requests, newRequest])
+    // const newTask = { id, ...task }
+    // setTasks([...tasks, newTask])
   }
 
-  // Delete Request
-  const deleteRequest = async (id) => {
-    const res = await fetch(`http://localhost:3000/requests/${id}`, {
+  // Delete Task
+  const deleteTask = async (id) => {
+    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
       method: 'DELETE',
     })
     //We should control the response status to decide if we will change the state or not.
     res.status === 200
-      ? setRequests(requests.filter((request) => request.id !== id))
-      : alert('Error Deleting This Request')
+      ? setTasks(tasks.filter((task) => task.id !== id))
+      : alert('Error Deleting This Task')
   }
 
   // Toggle Reminder
   const toggleReminder = async (id) => {
-    const requestToToggle = await fetchRequest(id)
-    const updRequest = { ...requestToToggle, reminder: !requestToToggle.reminder }
+    const taskToToggle = await fetchTask(id)
+    const updTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
 
-    const res = await fetch(`http://localhost:3000/requests/${id}`, {
+    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
       method: 'PUT',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify(updRequest),
+      body: JSON.stringify(updTask),
     })
 
     const data = await res.json()
 
-    setRequests(
-      requests.map((request) =>
-        request.id === id ? { ...request, reminder: data.reminder } : request
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, reminder: data.reminder } : task
       )
     )
   }
@@ -90,27 +91,28 @@ const App = () => {
     <Router>
       <div className='container'>
         <Header
-          onAdd={() => setShowAddRequest(!showAddRequest)}
-          showAdd={showAddRequest}
+          onAdd={() => setShowAddTask(!showAddTask)}
+          showAdd={showAddTask}
         />
         <Route
           path='/'
           exact
           render={(props) => (
             <>
-              {showAddRequest && <AddRequest onAdd={addRequest} />}
-              {requests.length > 0 ? (
-                <Requests
-                  requests={requests}
-                  onDelete={deleteRequest}
+              {showAddTask && <AddTask onAdd={addTask} />}
+              {tasks.length > 0 ? (
+                <Tasks
+                  tasks={tasks}
+                  onDelete={deleteTask}
                   onToggle={toggleReminder}
                 />
               ) : (
-                'No Requests created To Show'
+                'No Tasks To Show'
               )}
             </>
           )}
         />
+        <Route path='/about' component={About} />
         <Footer />
       </div>
     </Router>
