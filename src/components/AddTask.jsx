@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-const AddRequest = ({ onAdd }) => {
+const AddTask = ({ onAdd }) => {
   const [text, setText] = useState('')
   const [day, setDay] = useState('')
   const [reminder, setReminder] = useState(false)
@@ -9,7 +9,7 @@ const AddRequest = ({ onAdd }) => {
     e.preventDefault()
 
     if (!text) {
-      alert('Please add a request')
+      alert('Please add a task')
       return
     }
 
@@ -55,4 +55,4 @@ const AddRequest = ({ onAdd }) => {
   )
 }
 
-export default AddRequest;
+export default AddTask
